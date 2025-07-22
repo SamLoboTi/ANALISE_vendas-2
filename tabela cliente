@@ -1,0 +1,78 @@
+# percebi que as tabelas estavam sem nomes e apos liberar elas no supabase elas foram mexidas então eu criei outras tabela 
+#Importa as bibliotecas necessárias
+import pandas as pd
+import random
+from datetime import datetime, timedelta
+
+# Tenta importar Faker para nomes mais realistas. Se não conseguir, usa listas simples.
+try:
+    from faker import Faker
+    fake = Faker('pt_BR') # Define o idioma para português do Brasil
+    usar_faker = True
+except ImportError:
+    print("A biblioteca 'Faker' não está instalada. Gerando nomes com listas predefinidas.")
+    usar_faker = False
+    # Listas de nomes e sobrenomes para usar se Faker não estiver disponível
+    nomes_masculinos = ["João", "Pedro", "Carlos", "Fernando", "Lucas", "Gabriel", "Rafael", "Daniel", "Mateus", "Bruno"]
+    nomes_femininos = ["Maria", "Ana", "Juliana", "Mariana", "Isabela", "Beatriz", "Laura", "Sofia", "Manuela", "Alice"]
+    sobrenomes = ["Silva", "Santos", "Oliveira", "Souza", "Lima", "Costa", "Pereira", "Rodrigues", "Alves", "Martins"]
+
+
+# --- Configurações ---
+num_clientes = 1000
+nome_arquivo_csv = 'clientes.csv'
+data_inicio = datetime(2022, 1, 1) # Data de início para os cadastros
+data_fim = datetime(2025, 6, 30)   # Data de fim para os cadastros
+
+# --- Geração de Dados ---
+clientes_data = []
+
+for i in range(1, num_clientes + 1):
+    # ID_CLIENTE: Sequencial de 1 a 1000
+    id_cliente = i
+
+    # NOME_CLIENTE: Nomes e sobrenomes aleatórios
+    if usar_faker:
+        nome_cliente = fake.name() # Gera um nome completo aleatório
+    else:
+        # Combina um nome aleatório (masculino ou feminino) com um sobrenome
+        primeiro_nome = random.choice(nomes_masculinos + nomes_femininos)
+        sobrenome = random.choice(sobrenomes)
+        nome_cliente = f"{primeiro_nome} {sobrenome}"
+
+    # DATA_CADASTRO: Data aleatória dentro do período definido
+    # Calcula a diferença em dias entre as datas de início e fim
+    delta_dias = (data_fim - data_inicio).days
+    # Gera um número aleatório de dias para adicionar à data de início
+    dias_aleatorios = random.randint(0, delta_dias)
+    # Calcula a data de cadastro
+    data_cadastro = data_inicio + timedelta(days=dias_aleatorios)
+
+    clientes_data.append({
+        'ID_CLIENTE': id_cliente,
+        'NOME_CLIENTE': nome_cliente,
+        'DATA_CADASTRO': data_cadastro.strftime('%Y-%m-%d') # Formata a data como 'AAAA-MM-DD'
+    })
+
+# --- Criação do DataFrame Pandas ---
+df_clientes = pd.DataFrame(clientes_data)
+
+# --- Exportação para CSV ---
+# index=False para não escrever o índice do DataFrame como uma coluna no CSV
+# sep=',' para garantir que a vírgula seja o delimitador de campo
+# decimal='.' para garantir que números decimais (se houvesse) usassem ponto
+df_clientes.to_csv(nome_arquivo_csv, index=False, sep=',', decimal='.')
+
+print(f"Arquivo '{nome_arquivo_csv}' gerado com sucesso com {num_clientes} registros!")
+
+# --- Porta de Entrada para Download no Google Colab ---
+# Este bloco de código é específico para o ambiente Google Colab
+try:
+    from google.colab import files
+    files.download(nome_arquivo_csv)
+    print(f"\nO arquivo '{nome_arquivo_csv}' foi preparado para download.")
+    print("Verifique os downloads do seu navegador. Se não aparecer, clique no ícone de pasta à esquerda no Colab e depois no ícone de três pontos ao lado do arquivo para baixar.")
+except ImportError:
+    print("\nNão foi possível iniciar o download automático (provavelmente não está no Google Colab).")
+    print(f"O arquivo '{nome_arquivo_csv}' foi salvo na pasta local onde o script foi executado.")
+
