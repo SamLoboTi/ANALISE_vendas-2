@@ -1,0 +1,50 @@
+import random
+import pandas as pd
+from google.colab import files # Importa a função para download no Colab
+
+# --- PASSO 1: Dados de Estados e UFs do Brasil ---
+estados_ufs = [
+    ('Acre', 'AC'), ('Alagoas', 'AL'), ('Amapá', 'AP'), ('Amazonas', 'AM'),
+    ('Bahia', 'BA'), ('Ceará', 'CE'), ('Distrito Federal', 'DF'),
+    ('Espírito Santo', 'ES'), ('Goiás', 'GO'), ('Maranhão', 'MA'),
+    ('Mato Grosso', 'MT'), ('Mato Grosso do Sul', 'MS'),
+    ('Minas Gerais', 'MG'), ('Pará', 'PA'), ('Paraíba', 'PB'),
+    ('Paraná', 'PR'), ('Pernambuco', 'PE'), ('Piauí', 'PI'),
+    ('Rio de Janeiro', 'RJ'), ('Rio Grande do Norte', 'RN'),
+    ('Rio Grande do Sul', 'RS'), ('Rondônia', 'RO'), ('Roraima', 'RR'),
+    ('Santa Catarina', 'SC'), ('São Paulo', 'SP'), ('Sergipe', 'SE'),
+    ('Tocantins', 'TO')
+]
+
+# --- PASSO 2: Gerar 1000 Dados com UF, Estado e Faturamento Aleatórios ---
+dados_aleatorios = []
+for i in range(1000):
+    estado_nome, uf = random.choice(estados_ufs)
+    faturamento_aleatorio = round(random.uniform(500, 50000), 2)
+
+    dados_aleatorios.append({
+        'ID_Linha_Gerado': i + 1,
+        'Estado_Aleatorio': estado_nome,
+        'UF_Aleatoria': uf,
+        'Faturamento_Aleatorio': faturamento_aleatorio
+    })
+
+# --- PASSO 3: Criar um DataFrame Pandas ---
+df = pd.DataFrame(dados_aleatorios)
+
+# --- PASSO 4: Salvar o DataFrame como CSV no ambiente do Colab ---
+nome_arquivo_csv = 'dados_para_mapa_powerbi.csv'
+df.to_csv(nome_arquivo_csv, index=False, encoding='utf-8')
+
+print(f"Arquivo '{nome_arquivo_csv}' gerado com sucesso no ambiente do Google Colab.")
+
+# --- PASSO 5: Disparar o download do arquivo para o seu computador local ---
+print("\nIniciando o download do arquivo para o seu computador...")
+files.download(nome_arquivo_csv)
+
+print("\nDownload concluído! Verifique sua pasta de 'Downloads'.")
+
+# --- Lembrete Importante ---
+print("\n--- ATENÇÃO ---")
+print("Este arquivo CSV contém dados ALEATÓRIOS. Ele serve para você testar a funcionalidade do mapa no Power BI.")
+print("Ele NÃO representa seus dados de vendas reais. Para isso, você precisaria de uma coluna de Estado/UF nos seus dados de origem reais.")
